@@ -39,4 +39,4 @@ def face_detect(img):
 
 if __name__ == '__main__':
   main()
-  
+
