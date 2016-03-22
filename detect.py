@@ -1,13 +1,25 @@
 import sys
 import cv2
 import numpy as np
+import glob
 
 def main():
-    #img = cv2.imread('pout1.jpg')
-    image, area = face_detect(img)
-    cv2.imshow('img',img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    count = 0
+    sum_total = 0.0
+    for f in glob.glob('Color_Neutral_jpg/*.jpg'):
+
+        img = cv2.imread(f)
+        image, face_area, mouth_area = face_detect(img)
+        if mouth_area > 0:
+            print f, face_area/mouth_area
+            sum_total += (face_area/mouth_area)
+
+        count += 1
+        cv2.imwrite('processed/'+str(count)+'.jpg', img)
+    print 'average: ', (sum_total/count)
+    #cv2.imshow('img',img)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
 
 
 def mouth_detect(image):
@@ -21,7 +33,7 @@ def mouth_detect(image):
             max_y = my
             s = [mx, my, mw, mh]
             mouth_area = mw * mh
-    return s
+    return s, mouth_area
 
 
 def face_detect(img):
@@ -29,16 +41,22 @@ def face_detect(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
     face_area = 0
+    mouth_area = 0
+    roi_color = []
     for (x,y,w,h) in faces:
         cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
         roi_gray = gray[y:y+h, x:x+w]
         roi_color = img[y:y+h, x:x+w]
         face_area = w * h
 
-        s = mouth_detect(roi_gray)
+        s, mouth_area = mouth_detect(roi_gray)
+        break
 
-    cv2.rectangle(roi_color, (s[0], s[1]), (s[0]+s[2], s[1]+s[3]), (0, 255, 255, 0), 2)
-    return roi_color, face_area
+    if len(roi_color) > 0:
+        cv2.rectangle(roi_color, (s[0], s[1]), (s[0]+s[2], s[1]+s[3]), (0, 255, 255, 0), 2)
+        return roi_color, face_area, mouth_area
+    else:
+        return img, face_area, mouth_area
 
 
 if __name__ == '__main__':
