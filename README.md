@@ -15,5 +15,5 @@ Face-study
 ![Alt text](http://i.imgur.com/osULKDp.png "face to mouth ratio")
 
 * Shi-Tomasi Corner Detection (In progress)
-![Alt text](http://i.imgur.com/7viRHWJ.pn "corner detection")
+![Alt text](http://i.imgur.com/7viRHWJ.png "corner detection")
 
