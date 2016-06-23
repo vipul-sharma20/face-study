@@ -5,6 +5,6 @@
 
 * Accuracy: 82%
 
-* Face Area : Mouth Area (Ratio)
+* Face Area : Mouth Area (Ratio) (bounding rectancle)
 
-![Alt text](http://i.imgur.com/OCXmYmf.png  "face to mouth ratio")
+![Alt text](http://i.imgur.com/oTD4kjw.png  "face to mouth ratio")
