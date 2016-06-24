@@ -20,7 +20,7 @@ def main():
             count += 1
         if count == 150:
             break
-        #cv2.imwrite('processed/'+str(count)+'.jpg', img)
+        cv2.imwrite('processed_corners/'+str(count)+'.jpg', img)
     x = np.array(range(1, count+1))
     y = np.array(ratio_list)
     print len(x), len(y)
@@ -30,14 +30,7 @@ def main():
     ax.scatter(x, y)
 
     plt.show()
-    #plt.plot(range(1, count+1), ratio_list, 'ro')
-    #plt.axis([0, count+1, 0, 50])
-
-    #plt.show()
     print 'average: ', (sum_total/count)
-    #cv2.imshow('img',img)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
 
 
 def mouth_detect(image):
@@ -79,17 +72,42 @@ def face_detect(img):
         """
         m = roi_color[s[1]:s[1]+s[3], s[0]:s[0]+s[2]]
         cv2.rectangle(roi_color, (s[0], s[1]), (s[0]+s[2], s[1]+s[3]), (0, 255, 255, 0), 2)
-        return roi_color, m, face_area, mouth_area
+        gray = cv2.cvtColor(m, cv2.COLOR_BGR2GRAY)
+        thresh = threshold(gray)
+        m, mouth_area = draw_contours(m, thresh)
+        detect_corners(gray, m)
+        return img, face_area, mouth_area
     else:
         return img, face_area, mouth_area
 
 
+def draw_contours(img, thresh):
+    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE,
+                cv2.CHAIN_APPROX_SIMPLE)
+    if contours:
+        max_area = 0
+        c = 0
+        for contour in contours:
+            area = cv2.contourArea(contour)
+            if area > max_area:
+                max_area = area
+                c = contour
+        cv2.drawContours(img, contours, -1, (0, 255, 0), 3)
+    return img, max_area
+
+
 def threshold(image):
-    grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.cvtColor(grey, (35,35), 0)
+    blurred = cv2.GaussianBlur(image, (35,35), 0)
     _, thresh = cv2.threshold(blurred, 127, 255,
             cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
     return thresh
+
+
+def detect_corners(image, m):
+    corners = cv2.goodFeaturesToTrack(image, 6, 0.01, 10)
+    for corner in corners:
+        x, y = corner.ravel()
+        cv2.circle(m, (x,y), 3, 255, -1)
 
 if __name__ == '__main__':
     main()
