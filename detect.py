@@ -14,28 +14,30 @@ class FaceStudy(object):
         count = 0
         sum_total = 0.0
         ratio_list = []
-        for f in glob.glob('Color_Neutral_jpg/*.jpg'):
 
+        for f in glob.glob('Color_Neutral_jpg/*.jpg'):
             img = cv2.imread(f)
             image, face_area, mouth_area = self.face_detect(img)
             if mouth_area > 0:
                 print f, face_area/mouth_area
                 sum_total += (face_area/mouth_area)
                 ratio_list.append(face_area/mouth_area)
-
                 count += 1
             if count == 150:
                 break
             cv2.imwrite('processed_corners/'+str(count)+'.jpg', img)
+
         x = np.array(range(1, count+1))
         y = np.array(ratio_list)
+
         print len(x), len(y)
+
         fig, ax = plt.subplots()
         fit = np.polyfit(x, y, deg=1)
         ax.plot(x, fit[0] * x + fit[1], color='red')
         ax.scatter(x, y)
-
         plt.show()
+
         print 'average: ', (sum_total/count)
 
     def face_detect(self, image):
@@ -50,25 +52,29 @@ class FaceStudy(object):
         face_area = 0
         mouth_area = 0
         roi_color = []
-        s = None
+        m_coordinates = None
+
         for (x,y,w,h) in faces:
             cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
             roi_gray = gray[y:y+h, x:x+w]
             roi_color = image[y:y+h, x:x+w]
             face_area = w * h
+            m_coordinates, mouth_area = self.mouth_detect(roi_gray)
+            break  # whaattt !??
 
-            s, mouth_area = self.mouth_detect(roi_gray)
-            break
-
-        if len(roi_color) > 0 and s:
+        # if face and mouth detected
+        if len(roi_color) > 0 and m_coordinates:
             """
-            s[0] = mx
-            s[1] = my
-            s[2] = mw
-            s[3] = mh
+            m_coorinates[0] = mx
+            m_coorinates[1] = my
+            m_coorinates[2] = mw
+            m_coorinates[3] = mh
             """
-            mouth_crop = roi_color[s[1]:s[1]+s[3], s[0]:s[0]+s[2]]
-            cv2.rectangle(roi_color, (s[0], s[1]), (s[0]+s[2], s[1]+s[3]), (0, 255, 255, 0), 2)
+            mouth_crop = roi_color[m_coordinates[1]:m_coordinates[1]+m_coordinates[3],
+                            m_coordinates[0]:m_coordinates[0]+m_coordinates[2]]
+            cv2.rectangle(roi_color, (m_coordinates[0], m_coordinates[1]),
+                          (m_coordinates[0]+m_coordinates[2],
+                           m_coordinates[1]+m_coordinates[3]), (0, 255, 255, 0), 2)
             gray = cv2.cvtColor(mouth_crop, cv2.COLOR_BGR2GRAY)
             thresh = self.threshold(gray)
             m, mouth_area = self.draw_contours(mouth_crop, thresh)
@@ -86,14 +92,14 @@ class FaceStudy(object):
         mouth_cascade = cv2.CascadeClassifier('mouth_cascade.xml')
         mouth = mouth_cascade.detectMultiScale(image)
         max_y = 0
-        s = []
+        m_coordinates = []
         mouth_area = 0
         for (mx, my, mw, mh) in mouth:
             if my > max_y:
                 max_y = my
-                s = [mx, my, mw, mh]
+                m_coordinates = [mx, my, mw, mh]
                 mouth_area = mw * mh
-        return s, mouth_area
+        return m_coordinates, mouth_area
 
     def draw_contours(self, image, thresh):
         """
@@ -103,7 +109,7 @@ class FaceStudy(object):
         :return: contoured image (color), mouth area
         """
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE,
-                    cv2.CHAIN_APPROX_SIMPLE)
+                                               cv2.CHAIN_APPROX_SIMPLE)
         max_area = 0
         if contours:
             for contour in contours:
@@ -121,7 +127,7 @@ class FaceStudy(object):
         """
         blurred = cv2.GaussianBlur(image, (35,35), 0)
         _, thresh = cv2.threshold(blurred, 127, 255,
-                cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+                                  cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         return thresh
 
     def detect_corners(self, image, mouth_crop):
