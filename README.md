@@ -9,9 +9,11 @@ Face-study
 * Accuracy: 82%
 
 * Face Area : Mouth Area (Ratio) (bounding rectangle method)
+Average: 22.39
 ![Alt text](http://i.imgur.com/oTD4kjw.png  "face to mouth ratio")
 
 * Face Area : Mouth Area (Ratio) (lip contour method)
+Average: 54.30
 ![Alt text](http://i.imgur.com/osULKDp.png "face to mouth ratio")
 
 * Shi-Tomasi Corner Detection (In progress)
