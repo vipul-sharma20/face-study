@@ -12,33 +12,44 @@ class FaceStudy(object):
         :return: None
         """
         count = 0
-        sum_total = 0.0
-        ratio_list = []
+        sum_total_contour = 0.0
+        sum_total_rectangle = 0.0
+        ratio_list_contour = []
+        ratio_list_rectangle = []
+
 
         for f in glob.glob('Color_Neutral_jpg/*.jpg'):
             img = cv2.imread(f)
             image, face_area, mouth_area = self.face_detect(img)
-            if mouth_area > 0:
-                print f, face_area/mouth_area
-                sum_total += (face_area/mouth_area)
-                ratio_list.append(face_area/mouth_area)
+            if mouth_area[0] > 0 and mouth_area[1] > 0:
+                print f, face_area/mouth_area[0]
+                sum_total_contour += (face_area/mouth_area[0])
+                sum_total_rectangle += (face_area/mouth_area[1])
+                ratio_list_contour.append(face_area/mouth_area[0])
+                ratio_list_rectangle.append(face_area/mouth_area[1])
                 count += 1
-            if count == 150:
-                break
-            cv2.imwrite('processed_corners/'+str(count)+'.jpg', img)
+            #if count == 10:
+            #    break
+            #cv2.imwrite('processed_corners_noblur/'+str(count)+'.jpg', img)
+
+        print 'average contour: ', (sum_total_contour/count)
+        print 'average rectangle: ', (sum_total_rectangle/count)
 
         x = np.array(range(1, count+1))
-        y = np.array(ratio_list)
+        y = np.array(ratio_list_contour)
+        self.plot(x,y)
 
-        print len(x), len(y)
+        x = np.array(range(1, count+1))
+        y = np.array(ratio_list_rectangle)
+        self.plot(x, y)
 
+
+    def plot(self, x, y):
         fig, ax = plt.subplots()
         fit = np.polyfit(x, y, deg=1)
         ax.plot(x, fit[0] * x + fit[1], color='red')
         ax.scatter(x, y)
         plt.show()
-
-        print 'average: ', (sum_total/count)
 
     def face_detect(self, image):
         """
@@ -51,6 +62,7 @@ class FaceStudy(object):
         faces = face_cascade.detectMultiScale(gray, 1.3, 5)
         face_area = 0
         mouth_area = 0
+        m_area = 0
         roi_color = []
         m_coordinates = None
 
@@ -59,7 +71,7 @@ class FaceStudy(object):
             roi_gray = gray[y:y+h, x:x+w]
             roi_color = image[y:y+h, x:x+w]
             face_area = w * h
-            m_coordinates, mouth_area = self.mouth_detect(roi_gray)
+            m_coordinates, m_area = self.mouth_detect(roi_gray)
             break  # whaattt !??
 
         # if face and mouth detected
@@ -79,9 +91,9 @@ class FaceStudy(object):
             thresh = self.threshold(gray)
             m, mouth_area = self.draw_contours(mouth_crop, thresh)
             self.detect_corners(gray, mouth_crop)
-            return image, face_area, mouth_area
+            return image, face_area, (mouth_area, m_area)
         else:
-            return image, face_area, mouth_area
+            return image, face_area, (mouth_area, m_area)
 
     def mouth_detect(self, image):
         """
@@ -143,4 +155,6 @@ class FaceStudy(object):
             cv2.circle(mouth_crop, (x,y), 3, 255, -1)
 
 if __name__ == '__main__':
-    pass
+    fobj = FaceStudy()
+    fobj.main()
+
