@@ -1,8 +1,9 @@
 Face-study
 ==========
 
-* Study of neutral face dataset from: [http://agingmind.utdallas.edu/facedb/view/neutral-faces](http://agingmind.utdallas.edu/facedb/view/neutral-faces)
-* Dataset file: [Color Neutral jpg (11MB)](http://vitallongevity.utdallas.edu/faces/Color_Neutral_jpg.zip) 
+* ~~Study of neutral face dataset from: [http://agingmind.utdallas.edu/facedb/view/neutral-faces](http://agingmind.utdallas.edu/facedb/view/neutral-faces)~~ [URL DEAD]
+
+* ~~ Dataset file: [Color Neutral jpg (11MB)](http://vitallongevity.utdallas.edu/faces/Color_Neutral_jpg.zip) ~~ [URL DEAD]
 
 * Processed dataset: [Color Neutral Processed (23MB)](https://www.dropbox.com/s/80t4q349groiqfc/processed.zip?dl=0)
 
@@ -20,3 +21,14 @@ Average: 54.30
 
 ![Alt text](http://i.imgur.com/JMyJ9nt.png "corner detection")
 
+* Extracted mouth region
+
+![Alt text](http://i.imgur.com/1py7SiQ.png "extracted mouth")
+
+* Thresholding to extract lips (Otsu's Binarization Method)
+
+![Alt text](http://i.imgur.com/hmSLt7o.png "thresholding")
+
+* Complete processed image (contours + Shi-Tomasi corner detection)
+
+![Alt text](http://i.imgur.com/GUU08p3.png "processed image")
