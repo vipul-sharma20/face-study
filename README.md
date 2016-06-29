@@ -19,8 +19,23 @@ Average: 54.30
 
 Sample dataset example
 ----------------------
+* Sample dataset
+
+![Alt text](http://i.imgur.com/C22m8hZ.jpg "sample")
 
 * Detect face and mouth using Haar Feature-based Cascade Classifier
+  * Detect face
+
+  ![Alt text](http://i.imgur.com/TOHXM9y.png "face detect")
+
+  * Extract face and detect mouth
+
+  ![Alt text](http://i.imgur.com/Q0HXBh8.png "mouth detect")
+
+  * Correct detection
+
+  ![Alt text](http://i.imgur.com/eqUYhLk.png "correct mouth detect")
+
 * Extracted mouth region
 
 ![Alt text](http://i.imgur.com/1py7SiQ.png "extracted mouth")
